@@ -1,10 +1,10 @@
-title: ebn
-subtitle: null
-description: null
-author: John Doe
-language: null
-timezone: null
-url: 'http://yoursite.com'
+title: "/home/erben"
+subtitle: Alexander Erben's developer weblog
+description: Alexander Erben's developer weblog
+author: Alexander Erben
+language: English
+timezone: Europe/Berlin
+url: 'https://aerben.github.io'
 root: /
 permalink: ':year/:month/:day/:title/'
 permalink_defaults: null
@@ -37,7 +37,11 @@ date_format: YYYY-MM-DD
 time_format: 'HH:mm:ss'
 per_page: 10
 pagination_dir: page
-theme: landscape
+theme: light
 deploy:
-  type: null
+  type: git
+  repo: git@github.com:aerben/aerben.github.io.git
+  branch: master
 name: ebn.cloud
+
+

@@ -1,7 +1,7 @@
 ---
-title: Hello Consul (Part 1)
+title: Salve, Consul
 date: 2017-11-11 13:36:47
-tags:
+tags: consul
 ---
 When choosing the appropriate tool to get the job done, it is usually hard to foresee how big the impact of the decision is going to be. Some tools will cause us to curse ourselves for not having anticipated all the drawbacks, inconsistencies and bugs they carry along into your stack. Some just do their job and nothing more.
 But then there are those special kind of growers that just keep facinating us with the amount of use cases they help us solving easily. 
