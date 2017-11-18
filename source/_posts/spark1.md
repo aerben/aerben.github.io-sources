@@ -11,7 +11,7 @@ However, Spring Boot has it's downsides. As the dependency tree of your applicat
 
 Sometimes, it is relieving to tear away everything that makes Java services so cumbersome and heavyweight and start with something really nice and easy. Spark Framework is an example for a bare-bone approach to Java Microservices with a design that resembles node.js web frameworks like express.
 
-Let's start with the pom. In the first iteration, we do want to bother with making the project executable as a jar file, nor do we want a proper logging setup.
+Let's start with the `pom.xml`. In the first iteration, we do want to bother with making the project executable as a jar file, nor do we want a proper logging setup.
 
 ```xml
 <project>
@@ -59,6 +59,11 @@ public class Main {
 
 ```
 
-As a Tomcat veteran I just had to change the listen port from its default 4567 to 8080, but that is of course entirely up to you.
+As a Tomcat veteran I just had to change the listen port from its default `4567` to `8080`, but that is of course entirely up to you. We can now start the application out of an IDE like Eclipse or IntelliJ IDE and then query it to receive the expected result.
+
+```
+$ curl localhost:8080
+It's me!
+```
 
 Now we've got something that we can run in our IDE. But when we try to build the app with `mvn package` and then run it with `java -jar target/sample-service-1.0.jar`, the java command line runner informs us that the main manifest attribute is missing. Well, we did not configure our jar build yet and it won't be enough just to include the maven-jar-plugin in the build lifecycle. So let's explore this further in the next article.

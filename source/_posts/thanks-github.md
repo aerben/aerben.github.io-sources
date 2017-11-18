@@ -1,6 +1,6 @@
 ---
-title: Thank you, GitHub
-date: 2017-11-11 10:00:00
+title: Thanks for saving my life, GitHub!
+date: 2017-11-11 09:00:00
 tags: github
 ---
 
