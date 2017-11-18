@@ -4,12 +4,13 @@ date: 2017-11-11 10:00:00
 tags: java
 ---
 
+There are many options for writing Java Microservices. Here, I will start to explore the most minimal of possible approaches - the Spark Framework.
+
 For a long time now, Java Microservices have been equivalent with Spring Boot for me. It combines an almost ridiculously easy setup - at least for Java standards - with the unparalleled feature-richness of the Spring Framework.
-However, Spring Boot has it's downsides. As the dependency tree of your application grows, it is crucial to constantly check if unwanted autoconfiguration is being bootstrapped. Spring is king in hiding away abstractions from the user, to a point where it becomes almost impossible to debug issues in autoconfiguration classes without in-depth knowledge of the framework. This is especially a problem when using Spring Cloud with its numerous sometimes under-documented features and configuration options.
+However, Spring Boot has it's downsides. As the dependency tree of your application grows, it is crucial to constantly check if unwanted auto-configuration is being bootstrapped. Spring is king in hiding away abstractions from the user, to a point where it becomes almost impossible to debug issues in auto-configuration classes without in-depth knowledge of the framework. This is especially a problem when using Spring Cloud with its numerous sometimes under-documented features and configuration properties.
 
-Sometimes, it is relieving to tear away everything that makes Java services so cumbersome and heavyweight and start with something really nice and easy. Spark Framework is an example for a bare-bone approach to Java microservices with a design that resembles node.js web frameworks like express.
+Sometimes, it is relieving to tear away everything that makes Java services so cumbersome and heavyweight and start with something really nice and easy. Spark Framework is an example for a bare-bone approach to Java Microservices with a design that resembles node.js web frameworks like express.
 
-Here is how I set up my sample Spark application, complete with fat-jar bundling and docker build all via maven.
 Let's start with the pom. In the first iteration, we do want to bother with making the project executable as a jar file, nor do we want a proper logging setup.
 
 ```xml
@@ -58,7 +59,6 @@ public class Main {
 
 ```
 
-As a Tomcat veteran I just had to change the listen port to from its default 4567 to 8080, but that is of course entirely up to you.
-The library design of Spark has some basic resemblance with express apps, especially when using Java 8's lambda syntax (and why should we not).
+As a Tomcat veteran I just had to change the listen port from its default 4567 to 8080, but that is of course entirely up to you.
 
 Now we've got something that we can run in our IDE. But when we try to build the app with `mvn package` and then run it with `java -jar target/sample-service-1.0.jar`, the java command line runner informs us that the main manifest attribute is missing. Well, we did not configure our jar build yet and it won't be enough just to include the maven-jar-plugin in the build lifecycle. So let's explore this further in the next article.
