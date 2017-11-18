@@ -1,0 +1,24 @@
+Resources:
+
+  SomeEcsService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: some-cluster
+      DesiredCount: 1
+      ServiceName: some-service
+      TaskDefinition: !Ref SomeTaskDefinition
+
+  SomeTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      #TaskRoleArn: !GetAtt TaskRole.Arn
+      Family: some-service
+      ContainerDefinitions:
+        - Name: some-service-1
+          Hostname: some-service-1
+          Image: 427866372521.dkr.ecr.eu-central-1.amazonaws.com/some-service-repository:latest
+          MemoryReservation: 256
+          Memory: 256
+          Essential: true
+          PortMappings:
+            - ContainerPort: 8080

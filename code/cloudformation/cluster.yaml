@@ -1,0 +1,74 @@
+Resources:
+  ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: some-service-repository
+
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: some-cluster
+
+  ECSAutoScalingGroup:
+      Type: AWS::AutoScaling::AutoScalingGroup
+      Properties:
+        AvailabilityZones: [eu-central-1a, eu-central-1b]
+        LaunchConfigurationName: !Ref ContainerInstances
+        MinSize: 1
+        MaxSize: 1
+        DesiredCapacity: 1
+      CreationPolicy:
+        ResourceSignal:
+          Timeout: PT15M
+      UpdatePolicy:
+        AutoScalingReplacingUpdate:
+          WillReplace: 'true'
+
+  ContainerInstances:
+      Type: AWS::AutoScaling::LaunchConfiguration
+      Properties:
+        ImageId: ami-54f5303b
+        SecurityGroups: [!Ref ECSSecurityGroup]
+        InstanceType: t2.micro
+        IamInstanceProfile: !Ref EC2InstanceProfile
+        KeyName: PrivateAWSAccountKeyPairNewMb
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash -xe
+            echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+            yum install -y aws-cfn-bootstrap
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource ECSAutoScalingGroup --region ${AWS::Region}
+
+  ECSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allows port 8080 over TCP
+      SecurityGroupIngress:
+      - IpProtocol: 'tcp'
+        FromPort: '8080'
+        ToPort: '8080'
+        CidrIp: '0.0.0.0/0'
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles: [!Ref 'EC2Role']
+
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ec2.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: ecs-service
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action: ['ecs:*', 'logs:*', 'ecr:*']
+            Resource: '*'
