@@ -4,7 +4,7 @@ date: 2017-11-19 14:01:46
 tags: 
 - java
 - aws
-desc: Deploying docker containers to AWS is fun and there are many options. Here, I explore a simple approach for Java applications that uses Spotify's dockerfile-maven plugin.
+desc: Deploying docker containers to AWS is fun and there are many possible ways to do so. Here, I explore a simple approach for Java applications that uses Spotify's dockerfile-maven plugin.
 ---
 
 ## Introduction
