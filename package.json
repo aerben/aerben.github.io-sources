@@ -6,7 +6,7 @@
     "version": "3.4.1"
   },
   "scripts": {
-    "deploy": "git add . && git commit -m'Publish blog' && hexo clean && hexo g && hexo deploy"
+    "deploy": "hexo clean && hexo g && hexo deploy && git add . && git commit -m'Publish blog'"
   },
   "dependencies": {
     "hexo": "^3.2.0",

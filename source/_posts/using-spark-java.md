@@ -173,4 +173,4 @@ Everything is working fine - but what to do against the ugly SLF4J-errors? It tu
 
 Another thing we might want to change is the file name of the generated jar with dependencies. If we want to get rid of the assembly identifier in the file name, we can add the configuration property `appendAssemblyId` which you can see commented out in the above configuration of the `maven-assembly-plugin`. Note that when you use the same finalName in the maven-assembly-plugin than you use in the maven-jar-plugin, it will result in a warning that the original jar file is being overwritten.
 
-Great, so now we have a running Spark app that can be started directly from the command line. In the next post, we want to further explore what to do with it.
+Great, so now we have a running Spark app that can be started directly from the command line. In a later post, we will further explore what to do with it.
