@@ -14,6 +14,8 @@ However, Spring Boot has it's downsides. As the dependency tree of your applicat
 
 Sometimes, it is relieving to tear away everything that makes Java services so cumbersome and heavyweight and start with something really nice and easy. Spark Framework is an example for a bare-bone approach to Java Microservices with a design that resembles node.js web frameworks like express.
 
+You can follow along the examples by grabbing the source code from my [{% fa github %} GitHub](https://github.com/aerben/aerben.github.io-samples/tree/master/spark-sample-service) repository.
+
 ## Basic setup
 
 Let's start with the `pom.xml`. In the first iteration, we do want to bother with making the project executable as a jar file, nor do we want a proper logging setup.
@@ -22,9 +24,9 @@ Let's start with the `pom.xml`. In the first iteration, we do want to bother wit
 <project>
     <modelVersion>4.0.0</modelVersion>
     <groupId>me.aerben</groupId>
-    <artifactId>sample-service</artifactId>
+    <artifactId>spark-sample-service</artifactId>
     <version>1.0</version>
-    <name>sample-service</name>
+    <name>spark-sample-service</name>
     <dependencies>
         <dependency>
             <groupId>com.sparkjava</groupId>
@@ -76,8 +78,8 @@ It's me!
 Now we've got something that we can run in our IDE. But when we try to build the app and run it on the command line, it will not work:
 ```
 $ mvn package
-$ java -jar target/sample-service-1.0.jar
-no main manifest attribute, in "sample-service-1.0.jar"
+$ java -jar target/spark-sample-service-1.0.jar
+no main manifest attribute, in "spark-sample-service-1.0.jar"
 ```
 Well, we did not configure our jar build yet. To fix this, we have to apply some tweaks to the project's `pom.xml`. First, we add the `maven-jar-plugin` to the project's build configuration so that an executable jar is built:
 
@@ -103,7 +105,7 @@ When we build the project with `mvn package` now, we obtain a jar with the proje
 However, it still won't run:
 
 ```
-$ java -jar target/sample-service.jar
+$ java -jar target/spark-sample-service.jar
 
 Exception in thread "main" java.lang.NoClassDefFoundError: spark/Spark
 	at me.aerben.Main.main(Main.java:7)
@@ -143,11 +145,11 @@ The dependencies are still absent from the build jar. We have to include another
     </executions>
 </plugin>
 ```
-The assembly plugin will generate a jar file with all dependencies bundled in the target folder. The name of the file is `sample-service-jar-with-dependencies.jar` in our case.
+The assembly plugin will generate a jar file with all dependencies bundled in the target folder. The name of the file is `spark-sample-service-jar-with-dependencies.jar` in our case.
 We can now run the app as a normal java application:
 
 ```
-$ java -jar target/sample-service-jar-with-dependencies.jar
+$ java -jar target/spark-sample-service-jar-with-dependencies.jar
 SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
 SLF4J: Defaulting to no-operation (NOP) logger implementation
 SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.

@@ -1,6 +1,6 @@
 ---
 title: Thanks, GitHub!
-date: 2017-11-10 09:00:00
+date: 2017-11-16 19:00:00
 tags: github
 desc: GitHub is full of wonders. But sometimes, it can be a nanny.
 ---
