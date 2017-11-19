@@ -6,7 +6,7 @@ language: English
 timezone: Europe/Berlin
 url: 'https://www.aerben.me'
 root: /
-permalink: ':year/:month/:day/:title/'
+permalink: ':year/:title/'
 permalink_defaults: null
 source_dir: source
 public_dir: public
@@ -39,7 +39,7 @@ per_page: 10
 pagination_dir: page
 theme: cactus-light
 name: aerben.me
-nav:
-  Home: /
-  About: /about/
-  Writing: /archives/
+deploy:
+  type: git
+  repo: git@github.com:aerben/aerben.github.io.git
+  branch: master
