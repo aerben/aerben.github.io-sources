@@ -2,7 +2,7 @@
 title: Thanks, GitHub!
 date: 2017-11-16 19:00:00
 tags: github
-desc: GitHub is full of wonders. But sometimes, it can be a nanny.
+desc: GitHub is full of wonders. It just launched a new interesting feature that tries to make the world a bit safer.
 ---
 
 GitHub is full of wonders. I just started to play around with some Hexo themes and plugins for my new blog. Then when I pushed some changes to the GitHub Pages repo, I receive an ominous mail.
