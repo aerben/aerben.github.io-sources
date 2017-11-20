@@ -161,7 +161,7 @@ It's me!
 ```
 ## Final tweaks
 
-Everything is working fine - but what to do against the ugly SLF4J-errors? It turns out that Spark adds Slf4J as logging facade to the classpath, but thankfully lets us choose the implementation we want to use. The slf4j-simple implementation will just dump the logs to standard output and required no additional configuration.
+Everything is working fine - but what to do against the ugly SLF4J-errors? It turns out that Spark adds SLF4J as logging facade to the classpath, but thankfully lets us choose the implementation we want to use. The slf4j-simple implementation will just dump the logs to standard output and required no additional configuration.
 
 ```xml
 <dependency>
