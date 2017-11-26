@@ -1,5 +1,6 @@
 ---
 title: Deploy a Java app as Docker container on AWS with Maven (part 1)
+author: Alexander Erben
 date: 2017-11-19 14:01:46
 tags: 
 - java

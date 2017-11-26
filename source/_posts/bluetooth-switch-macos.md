@@ -1,5 +1,6 @@
 ---
 title: Switching bluetooth on and off on macOS via Spotlight
+author: Alexander Erben
 date: 2017-09-19 12:29:56
 tags: mac
 desc: My new headphones keep connecting to my MacBook even though it is in stand-by mode. But I hacked my way around this issue.

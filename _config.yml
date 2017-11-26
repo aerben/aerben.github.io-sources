@@ -38,7 +38,7 @@ time_format: 'HH:mm:ss'
 per_page: 10
 pagination_dir: page
 theme: cactus-light
-name: aerben.me
+name: Alexander Erben
 deploy:
   type: git
   repo: git@github.com:aerben/aerben.github.io.git

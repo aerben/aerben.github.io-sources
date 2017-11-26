@@ -1,5 +1,6 @@
 ---
 title: Using Spark as an alternative to Spring Boot
+author: Alexander Erben
 date: 2017-11-11 10:00:00
 tags: java
 desc: There are many options for writing Java Microservices. Here, I will start to explore the most minimal of possible approaches - the Spark Framework.
