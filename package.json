@@ -6,9 +6,7 @@
     "version": "3.4.1"
   },
   "scripts": {
-    "push": "hexo clean && hexo g && hexo deploy && cd themes/cactus-light && git add . && git commit -m'Publish theme' && cd ../.. && git add . && git commit -m'Publish blog'",
-    "deploy-all": "hexo clean && hexo g && hexo deploy && cd themes/cactus-light && git add . && git commit -m'Publish theme' && cd ../.. && git add . && git commit -m'Publish blog'",
-    "deploy": "hexo clean && hexo g && hexo deploy"
+    "deploy": "hexo clean && hexo g && hexo deploy && git add . && git commit -m'Publish theme' && git push"
   },
   "dependencies": {
     "hexo": "^3.2.0",
