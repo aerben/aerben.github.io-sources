@@ -1,11 +1,11 @@
 ---
-title: Deploy a Java app as Docker container on AWS with Maven (part 1)
+title: Deploy a Java app as Docker container on AWS with Maven (Part 1)
 author: Alexander Erben
 date: 2017-11-19 14:01:46
 tags: 
 - java
 - aws
-desc: Deploying docker containers to AWS is fun and there are many possible ways to do so. Here, I explore a simple approach for Java applications that uses Spotify's dockerfile-maven plugin.
+desc: Deploying docker containers to AWS is fun and there are many possible ways to do so. Here, I explore a simple approach for Java applications that uses Spotify's dockerfile-maven plugin. Part 1 describes all steps necessary to publish docker images to AWS ECR.
 ---
 
 ## Introduction
@@ -38,11 +38,11 @@ $ aws ecr create-repository --repository-name spark-sample-service
 
 {
     "repository": {
-        "registryId": "[[REPO_ID]]",
+        "registryId": "[[REGISTRY_ID]]",
         "repositoryName": "spark-sample-service",
-        "repositoryArn": "arn:aws:ecr:eu-central-1:[[REPO_ID]]:repository/spark-sample-service",
+        "repositoryArn": "arn:aws:ecr:eu-central-1:[[ACCOUNT_ID]]:repository/spark-sample-service",
         "createdAt": 1511103918.0,
-        "repositoryUri": "[[REPO_ID]].dkr.ecr.eu-central-1.amazonaws.com/spark-sample-service"
+        "repositoryUri": "[[ACCOUNT_ID]].dkr.ecr.eu-central-1.amazonaws.com/spark-sample-service"
     }
 }
 ```
@@ -108,7 +108,7 @@ We will now configure the dockerfile-plugin itself.
         </execution>
     </executions>
     <configuration>
-        <repository>[[REPO_ID]].dkr.ecr.eu-central-1.amazonaws.com/spark-sample-service</repository>
+        <repository>[[ACCOUNT_ID]].dkr.ecr.eu-central-1.amazonaws.com/spark-sample-service</repository>
         <tag>${project.version}</tag>
         <buildArgs>
             <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
@@ -157,7 +157,7 @@ $ mvn package
 This starts to get annoying! But the mistake is on our side: In order to push images to ECR, we have to authenticate against it with basic auth credentials. Luckily, this is a very easy task with the help of the AWS CLI.
 ```
 $ aws ecr get-login
-docker login -u AWS -p PASSWORD -e none https://[[REPO_ID]].dkr.ecr.eu-central-1.amazonaws.com
+docker login -u AWS -p PASSWORD -e none https://[[ACCOUNT_ID]].dkr.ecr.eu-central-1.amazonaws.com
 ```
 The cli returns for us a ready-to use command line call to authenticate our local Docker installation with ECR. 
 Well, almost ready-to-use. Because on newer versions of Docker, you have to remove the `-e` flag, which makes automation a bit harder.
@@ -168,7 +168,7 @@ To work around this issue, we can store the credentials in `.m2/settings.xml` an
 Anyway: If you a are a Mac user like me, put the folling server entry in `.m2/settings.xml`:
 ```xml
 <server>
-    <id>[[REPO_ID]].dkr.ecr.eu-central-1.amazonaws.com</id>
+    <id>[[ACCOUNT_ID]].dkr.ecr.eu-central-1.amazonaws.com</id>
     <username>AWS</username>
     <password>[YOUR_PASSWORD]</password>
 </server>
@@ -182,7 +182,7 @@ Then go ahead and add the `useMavenSettingsForAuth` configuration property to th
     <artifactId>dockerfile-maven-plugin</artifactId>
     (...)
     <configuration>
-        <repository>[[REPO_ID]].dkr.ecr.eu-central-1.amazonaws.com/spark-sample-service</repository>
+        <repository>[[ACCOUNT_ID]].dkr.ecr.eu-central-1.amazonaws.com/spark-sample-service</repository>
         (...)
         <!-- the following one -->
         <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
@@ -196,7 +196,7 @@ Now, finally, we can push the image:
 $ mvn deploy
 (...)
 [INFO] --- dockerfile-maven-plugin:1.3.6:push (default) @ spark-sample-service ---
-[INFO] The push refers to a repository [[[REPO_ID]].dkr.ecr.eu-central-1.amazonaws.com/spark-sample-service]
+[INFO] The push refers to a repository [[[ACCOUNT_ID]].dkr.ecr.eu-central-1.amazonaws.com/spark-sample-service]
 [INFO] Image 11f5b463d7c9: Preparing
 [INFO] Image 6c374bfe7f7e: Preparing
 [INFO] Image 6abaa286b4af: Preparing
@@ -220,7 +220,7 @@ $ mvn deploy
 
 And to test it, we can simply start a container from the newly pushed image:
 ```
-$ docker run -p 8080:8080 [[REPO_ID]].dkr.ecr.eu-central-1.amazonaws.com/spark-sample-service:1.0 &
+$ docker run -p 8080:8080 [[ACCOUNT_ID]].dkr.ecr.eu-central-1.amazonaws.com/spark-sample-service:1.0 &
 $ curl localhost:8080
 It's me!
 ```
