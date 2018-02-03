@@ -5,6 +5,7 @@ date: 2017-11-19 14:01:46
 tags: 
 - java
 - aws
+- docker
 desc: Deploying docker containers to AWS is fun and there are many possible ways to do so. Here, I explore a simple approach for Java applications that uses Spotify's dockerfile-maven plugin. Part 1 describes all steps necessary to publish docker images to AWS ECR.
 ---
 
@@ -92,7 +93,15 @@ Remove the maven-assembly-plugin and maven-jar-plugin entries from the pom of th
 
 The maven-jar-plugin configuration makes sure that the source code of your application is bundled with a fitting manifest file that specifies the main class and classpath entries necessary to find the dependencies relative to the jar file location. The dependency plugin then makes sure that all dependencies are copied into the `lib` folder in the project's target.
 
-We will now configure the dockerfile-plugin itself.
+We will now configure the dockerfile-plugin itself. First, add a properties-segment to your pom and specify the aws account id:
+
+```xml
+<properties>
+    <awsAccountId>Enter account id here</awsAccountId>
+</properties>
+```
+You can either enter your account ID here, or pass it in later by appending `-DawsAccountId=[[YOUR_ACCOUNT_ID_HERE]]` to every maven command.
+Then, add the following plugin definition to your pom:
 ```xml
 <plugin>
     <groupId>com.spotify</groupId>
@@ -108,7 +117,7 @@ We will now configure the dockerfile-plugin itself.
         </execution>
     </executions>
     <configuration>
-        <repository>[[ACCOUNT_ID]].dkr.ecr.eu-central-1.amazonaws.com/spark-sample-service</repository>
+        <repository>${awsAccountId}.dkr.ecr.eu-central-1.amazonaws.com/${project.name}</repository>
         <tag>${project.version}</tag>
         <buildArgs>
             <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
@@ -156,13 +165,12 @@ $ mvn package
 ```
 This starts to get annoying! But the mistake is on our side: In order to push images to ECR, we have to authenticate against it with basic auth credentials. Luckily, this is a very easy task with the help of the AWS CLI.
 ```
-$ aws ecr get-login
+$ aws ecr get-login --no-include-email
 docker login -u AWS -p PASSWORD -e none https://[[ACCOUNT_ID]].dkr.ecr.eu-central-1.amazonaws.com
 ```
 The cli returns for us a ready-to use command line call to authenticate our local Docker installation with ECR. 
-Well, almost ready-to-use. Because on newer versions of Docker, you have to remove the `-e` flag, which makes automation a bit harder.
 
-Anyway, after having logged in, we could assume that the plugin picks up the credentials and uses it to authenticate against ECR. On Linux, this will work, but sadly, on macOS, Docker by default uses the macOS keychain to store the credentials (you can see it in `~/.docker/config.json`), and this workflow is [not working with dockerfile-maven](https://github.com/spotify/docker-maven-plugin/issues/321).
+After having logged in, we could assume that the plugin picks up the credentials and uses it to authenticate against ECR. On Linux, this will work, but sadly, on macOS, Docker by default uses the macOS keychain to store the credentials (you can see it in `~/.docker/config.json`), and this workflow is [not working with dockerfile-maven](https://github.com/spotify/docker-maven-plugin/issues/321).
 
 To work around this issue, we can store the credentials in `.m2/settings.xml` and tell the plugin to use these credentials to authenticate against ECR. This is an inconvenient approach as it makes automation much harder: the credentials are only temporary, so we have to write a script that puts the credentials in `settings.xml` everytime they expire.
 Anyway: If you a are a Mac user like me, put the folling server entry in `.m2/settings.xml`:
@@ -182,7 +190,7 @@ Then go ahead and add the `useMavenSettingsForAuth` configuration property to th
     <artifactId>dockerfile-maven-plugin</artifactId>
     (...)
     <configuration>
-        <repository>[[ACCOUNT_ID]].dkr.ecr.eu-central-1.amazonaws.com/spark-sample-service</repository>
+        <repository>${awsAccountId}.dkr.ecr.eu-central-1.amazonaws.com/${project.name}</repository>
         (...)
         <!-- the following one -->
         <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
