@@ -1,5 +1,5 @@
 ---
-title: Using Spark as an alternative to Spring Boot
+title: Using Spark for Java Microservices
 author: Alexander Erben
 date: 2017-11-11 10:00:00
 tags: java
