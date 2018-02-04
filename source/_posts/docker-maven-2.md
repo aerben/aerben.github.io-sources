@@ -11,34 +11,33 @@ desc: Part 2 describes all steps necessary to deploy docker containers from imag
 In the recent [part 1](../docker-maven-1) of this series, we published a docker image containing a simple microservice to to the AWS Elastic Container Registry (ECR). 
 ECR can be used like any other Docker registry to pull images and run them on any authenticated EC2 instance.
 
-This article describes the necessary steps to provide a minimal EC2 instance that can run a docker container from an image in ECR. The instance is set up via the AWS CLI tools, and _not_ using the Web Console, on purpose. As soon as you want to go serious with your AWS endeavours, the UI won't be of much use - interaction with it cannot be feasibly automated. So, we resort to the CLI that can be used in your setup scripts.
+This article describes the necessary steps to provide a minimal EC2 instance that can run a docker container from an image in ECR. The instance is set up via the AWS CLI tools, and _not_ using the Web Console, on purpose. As soon as you want to go serious with your AWS endeavours, the UI won't be of much use - interaction with it cannot be feasibly automated. So, we prefer the CLI as it can be used in your setup scripts.
 
 
-## Prerequisite: An existing ECR repository with images
+## Prerequisite: An existing ECR registry with images
 
-This article assumes that you have already pushed a docker image to an ECR registry in your AWS account. You should read [part 1](../docker-maven-1) of the series, where you will create a maven project that pushes docker images to ECR. You can also read the [getting started](https://docs.aws.amazon.com/AmazonECR/latest/userguide/ECR_GetStarted.html) guide on AWS ECR and push an image to your repository.
+This article assumes that you have already pushed a docker image to an ECR registry in your AWS account. You should read [part 1](../docker-maven-1) of the series, where you will create a maven project that pushes docker images to ECR. You can also read the [getting started](https://docs.aws.amazon.com/AmazonECR/latest/userguide/ECR_GetStarted.html) guide on AWS ECR and push an image to your registry.
 
 ## Provide an AWS EC2 key pair
 
-Our docker container will be deployed on an EC2 instance, so naturally, we have to provide an instance. But there's a lot more to it: The EC2 instance must be accessible for us via SSH and HTTP, it must run the docker agent and have access to ECR where our docker images reside.
+Our docker container will be deployed on EC2, so naturally, we have to provide an instance. But there's a lot more to it: The EC2 instance must be accessible for us via SSH and HTTP, it must run the docker agent and have access to ECR where our docker images reside.
 
 First things first: To be able to log in into our instance later on, we first have to create a key pair. If you already have a key pair registered on your AWS account, you can safely skip this section.
 To create an AWS key pair for your account, follow along the instructions given by the [AWS documentation](https://docs.aws.amazon.com/cli/latest/userguide/cli-ec2-keypairs.html#creating-a-key-pair). On UNIX-like systems, the command is as follows:
 
 ```
-$ aws ec2 create-key-pair --region eu-central-1 --key-name MyKeyPair --query 'KeyMaterial' --output text > MyKeyPair.pem
+$ aws ec2 create-key-pair --key-name MyKeyPair --query 'KeyMaterial' --output text > MyKeyPair.pem
 $ chmod 400 MyKeyPair.pem
 ```
 Remember the location where you stored the key file. You will need it later.
 
 ## Create a security group
 
-By default, any EC2 instance you create won't be accessible from your local machine. We will have to make sure you can log in to the instance via SSH to install docker and run images. We will need to access the EC2 instance over port 22 for SSH and, in case you use the docker image created in the [last article](../docker-maven-1),
-port 8080 for the web application. 
+By default, any EC2 instance you create won't be accessible from your local machine. We will have to make sure you can log in to the instance via SSH to install docker and run images. Access must be granted over port 22 for SSH and, in case you use the docker image created in the [last article](../docker-maven-1), port 8080 for the web application. 
 
 This article will not go into great detail on AWS networking. The instance as well as all associated networking resources will be deployed in the account's default VPC. If you don't yet know what a VPC is, that's fine - think of it as an isolated network in the AWS cloud where you can safely run your EC2 instances.
 
-To open up the necessary ports for your local machine, we can use security groups. A security group in AWS behaves like a firewall preventing or granting access to your instances to a range of source IP addresses, protocols and ports. In our example, we need TCP over port 22 for SSH and TCP over port 8080 for HTTP from the IP address of your computer - or, if you don't know your IP address and are lazy, for the whole world.
+To open up the necessary ports for access from your local machine, we will use security groups. A security group in AWS behaves like a firewall preventing or granting access to your instances to a range of source IP addresses, protocols and ports. In our example, we need TCP over port 22 for SSH and TCP over port 8080 for HTTP from the IP address of your computer - or, if you don't know your IP address and are lazy, for the whole world.
 
 To create a security group, use the following command:
 
@@ -46,7 +45,7 @@ To create a security group, use the following command:
 $ aws ec2 create-security-group --group-name DockerHostSecurityGroup --description "A security group for the docker tutorial on aerben.me"
 ```
 
-Then go ahead and allow access for ports 22 and 8080 over TCP. The given commands will allow access to every source IP address by specifying the CIDR `0.0.0.0/0`. If you know your public IP address or a range in which it will be, you can and should substitute the appropriate CIDR range.
+Then go ahead and allow access for ports 22 and 8080 over TCP. The given commands will allow access to every source IP address by specifying the CIDR block  `0.0.0.0/0`. If you know your public IP address or a range in which it will be, you can and should substitute the appropriate CIDR range.
 
 ```
 $ aws ec2 authorize-security-group-ingress --group-name DockerHostSecurityGroup --protocol tcp --port 22 --cidr "0.0.0.0/0"
@@ -59,9 +58,9 @@ The security group is now ready to use for the EC2 instance.
 
 ## Run an EC2 instance
 
-Now that we have all prerequisites in place, actually creating the instance we want is surprisingly simple. 
+Now that we have all prerequisites in place, actually creating the instance is pleasantly simple. 
 
-All you need is the key and the security group you just created and a so-called Amazon Machine Image (AMI) ID. This is the image used to create the boot volume of your instance. The example below uses the AMI for Amazon Linux in the EU(Frankfurt) region. You can look up the Amazon Machine Image for your region [here](https://aws.amazon.com/de/amazon-linux-ami/). Be sure to use the "HVM (SSD) EBS-backed 64 Bit" AMI.
+All you need is the key and the security group you just created and a so-called Amazon Machine Image (AMI) ID. This is the image used to create the boot volume of your instance. The example below uses the AMI for Amazon Linux in the EU (Frankfurt) region. You can look up the Amazon Machine Image for your region [here](https://aws.amazon.com/de/amazon-linux-ami/). Be sure to use the "HVM (SSD) EBS-backed 64 Bit" AMI.
 The command to run a free-tier eligible instance is as follows:
 
 ```
@@ -71,7 +70,7 @@ $ aws ec2 run-instances --image-id ami-5652ce39 --count 1 --instance-type t2.mic
 We will now have to wait until the instance comes alive. The following command will tell you the current state of your instance as well as its public IP address and Instance ID, both of which we will soon need:
 
 ```
-$ aws ec2 describe-instances --filters "Name=instance-state-name,Values=running"  --query "Reservations[*].Instances[*].[InstanceId,PublicIpAddress,State.Name]"
+$ aws ec2 describe-instances --query "Reservations[*].Instances[*].[InstanceId,PublicIpAddress,State.Name]"
 [
     [
         [
@@ -133,8 +132,8 @@ Oh yeah, we've seen that already in the last article. We need to perform a docke
 
 ## Authenticate docker with ECR and run the image
 
-If you have read the last article, this is no news for you: for the instance to gain access to ECR, you must first authenticate docker against the repository.
-To that end, use the AWS ECR tools to retrieve credentials for logging in. The `get-login command returns a ready-to-use command for `docker login` to authenticate.
+If you have read the last article, this is no news for you: for the instance to gain access to ECR, you must first authenticate docker against the registry.
+To that end, use the AWS ECR tools to retrieve credentials for logging in. The `get-login` command returns a ready-to-use command for `docker login` to authenticate.
 
 ```
 $ aws ecr get-login --no-include-email
@@ -166,7 +165,7 @@ Status: Downloaded newer image for 427866372521.dkr.ecr.eu-central-1.amazonaws.c
 and verify your setup by calling your service via the instance's public IP address:
 
 ```
-curl http://35.158.97.195:8080/
+curl 35.158.97.195:8080
 It's me!
 ```
 
@@ -178,7 +177,7 @@ Don't forget to terminate your instance as soon as you are done:
 aws ec2 terminate-instances  --instance-ids i-0408fef6a295da99e
 ```
 
-replace the instance id with the one of your own instance.
+Replace the instance id with the one of your own instance.
 
 ## Conclusion
 
