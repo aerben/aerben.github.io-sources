@@ -4,14 +4,15 @@ author: Alexander Erben
 date: 2018-02-08 18:18:03
 tags: 
 - aws
+desc: If you want to set up DynamoDB as code and are stuck at the autoscaling part, I got you covered!
 ---
 
 Recently, I wanted to bake my DynamoDB table setup into a CloudFormation template. The table contained a global secondary index and
-is an autoscaling target for read and write capacity scaling. Registering auto scaling with a DynamoDB table in Cloudformation isn't hard at all.
+is an autoscaling target for read and write capacity scaling. Registering autoscaling with a DynamoDB table in Cloudformation isn't hard at all.
 Yet it isn't immediately obvious how to register the index as scalable target. The [documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html) did not go into detail about index autoscaling, so how do we do it?
 
 First, we will register the table itself as scalable target for write capacity and then attach a policy to it. This isn't strictly necessary
-to enable scaling for the index, but why would you want to auto-scale the index and not the table itself?
+to enable scaling for the index, but why would you want to autoscale the index and not the table itself?
 The following CloudFormation snipped will do the trick:
 
 ```yaml
