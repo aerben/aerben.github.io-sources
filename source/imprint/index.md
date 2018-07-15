@@ -7,7 +7,7 @@ date: 2017-11-20 09:19:15
 Alexander Erben
 Viktoriastr. 2
 Siegburg, Germany
-Mail: a_erben@outlook.com
+Mail: a.erben.eb@outlook.de
 
 
 ## Privacy Policy under German law / Datenschutzerklärung
